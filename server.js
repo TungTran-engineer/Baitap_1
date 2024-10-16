@@ -7,19 +7,18 @@ import { dirname, join } from 'path';
 const app = express();
 const PORT = 3000;
 
-// Định nghĩa __dirname để dùng trong các đường dẫn file
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Middleware để xử lý form data
+app.use(express.static(__dirname));
+
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Trang đăng nhập (GET)
 app.get('/', (req, res) => {
     res.send(`
         <form action="/login" method="POST">
             <div style="text-align: center;">
-                <img src="https://via.placeholder.com/150" alt="User Avatar">
+                <img src="tung.png" alt="User Avatar" style="width: 100px; height: auto;">
                 <h2>Login</h2>
                 <label for="username">Username</label><br>
                 <input type="text" id="username" name="username" required><br>
@@ -32,11 +31,9 @@ app.get('/', (req, res) => {
     `);
 });
 
-// Xử lý đăng nhập (POST)
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
 
-    // Đọc file user.txt từ đường dẫn tuyệt đối
     const filePath = join(__dirname, 'user.txt');
     fs.readFile(filePath, 'utf8', (err, data) => {
         if (err) {
@@ -46,7 +43,6 @@ app.post('/login', (req, res) => {
 
         const [savedUsername, savedPassword] = data.split(':').map(item => item.trim());
 
-        // Kiểm tra tài khoản và mật khẩu
         if (username === savedUsername && password === savedPassword) {
             res.send(`<h2>Welcome, ${username}!</h2>`);
         } else {
@@ -55,5 +51,6 @@ app.post('/login', (req, res) => {
     });
 });
 
-// Server chạy ở port 3000 
-app.listen(PORT)
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+});
